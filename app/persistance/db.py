@@ -4,13 +4,10 @@ import os
 
 
 # local stored database
-DATABASE_URL = r"sqlite:///app.db"
+DATABASE_URL = r"sqlite:///" + os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "app.db")
 
-# in-memory database for testing
-TEST_DATABASE_URL = "sqlite:///test.db"
 
-engine = create_engine(DATABASE_URL, echo=False) \
-    if os.getenv("ENV") != "test" else create_engine(TEST_DATABASE_URL, echo=False)
+engine = create_engine(DATABASE_URL, echo=False)
 
 
 def create_db_and_tables():

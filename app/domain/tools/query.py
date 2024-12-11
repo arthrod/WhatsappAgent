@@ -65,6 +65,9 @@ def sql_query_from_config(
         if wheres:
             for where in wheres:
 
+                if not where:
+                    continue
+
                 if where.column not in sql_model.__annotations__:  # noqa
                     return f"Column {where['column']} not found in model {sql_model.__name__}"
 
