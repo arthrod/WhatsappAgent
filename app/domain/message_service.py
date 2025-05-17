@@ -6,6 +6,7 @@ from typing import BinaryIO
 from app.domain.agents.demo_agent import demo_agent
 from app.schema import Audio, User
 from openai import OpenAI
+from security import safe_requests
 
 
 
@@ -41,13 +42,13 @@ def download_file_from_facebook(file_id: str, file_type: str, mime_type: str) ->
     # First GET request to retrieve the download URL
     url = f"https://graph.facebook.com/v19.0/{file_id}"
     headers = {"Authorization": f"Bearer {WHATSAPP_API_KEY}"}
-    response = requests.get(url, headers=headers)
+    response = safe_requests.get(url, headers=headers)
 
     if response.status_code == 200:
         download_url = response.json().get('url')
 
         # Second GET request to download the file
-        response = requests.get(download_url, headers=headers)
+        response = safe_requests.get(download_url, headers=headers)
 
         if response.status_code == 200:
             file_extension = mime_type.split('/')[-1].split(';')[0]  # Extract file extension from mime_type
