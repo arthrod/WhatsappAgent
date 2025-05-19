@@ -4,8 +4,12 @@ from app.domain.agents.base import OpenAIAgent
 from app.domain.tools.base import Tool
 from app.domain.tools.report_tool import report_tool
 from pydantic import BaseModel, ConfigDict, Field
+import asyncio
 
-from app.domain.tools.utils import convert_to_openai_tool
+from pydantic_ai.tools import Tool as PATool, RunContext
+from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.result import Usage
 
 
 SYSTEM_MESSAGE = """You are tasked with completing specific objectives and must report the outcomes. At your disposal, you have a variety of tools, each specialized in performing a distinct type of task.
@@ -74,4 +78,25 @@ class TaskAgent(BaseModel):
 
     @property
     def openai_tool_schema(self):
-        return convert_to_openai_tool(self.arg_model, name=self.name, description=self.description)
+        def _dummy(arg: self.arg_model) -> str:  # type: ignore
+            return ""
+
+        pa_tool = PATool(_dummy)
+        provider = OpenAIProvider(api_key="dummy")
+        ctx = RunContext(deps=None, model=OpenAIModel("gpt-3.5-turbo", provider=provider), usage=Usage(), prompt=None)
+        tool_def = asyncio.run(pa_tool.prepare_tool_def(ctx))
+        parameters = tool_def.parameters_json_schema
+        if parameters.get("required"):
+            parameters.pop("required")
+        parameters["properties"] = {
+            key: value for key, value in parameters.get("properties", {}).items()
+            if key != "arg"
+        }
+        return {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": parameters,
+            },
+        }
