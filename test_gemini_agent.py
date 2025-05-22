@@ -1,7 +1,6 @@
 import asyncio
 from app.domain.agents.gemini_agent import GeminiAgent
-from app.domain.tools.base import report_tool # Assuming report_tool is a Tool instance
-
+from app.domain.tools.reporting import report_tool  # adjust to actual path
 async def main():
     """
     Basic integration test for GeminiAgent.
