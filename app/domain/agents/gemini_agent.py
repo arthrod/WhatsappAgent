@@ -59,8 +59,12 @@ class GeminiAgent:
     # If a session already exists, it should ideally be closed first.
     # For now, we'll just let the new connect overwrite it.
     print(f"Connecting to live server with config: {session_config}")
-    async with self.client.aio.live.connect(model=self.model_name, config=session_config) as session:
-      self.session = session
+    # Ensure any previously active session is closed before creating a new one.
+    # This is a simplified example; consider logging and more robust error handling here.
+    if self.session and hasattr(self.session, 'is_active') and self.session.is_active and hasattr(self.session, 'close'):
+        await self.session.close()
+
+    self.session = await self.client.aio.live.connect(model=self.model_name, config=session_config)
       # TODO: Implement message sending/receiving logic here (if any immediate action after connect).
       pass
 
