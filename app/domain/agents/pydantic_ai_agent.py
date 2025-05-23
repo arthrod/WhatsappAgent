@@ -9,18 +9,34 @@ from app.domain.tools.base import Tool
 
 
 class PydanticAIAgent:
-    """Simple wrapper around `pydantic_ai.Agent` to mirror the existing interface."""
+    """
+    A wrapper around `pydantic_ai.Agent` that provides compatibility with the application's agent interface.
+    
+    This agent encapsulates the functionality of pydantic-ai, handling tool conversion,
+    context management, and execution of user requests through the underlying LLM.
+    """
 
     def __init__(
         self,
-        tools: List[Tool],
+        tools: list[Tool],
         *,
         system_message: str,
         model_name: str = "openai:gpt-3.5-turbo-0125",
-        context: Optional[str] = None,
-        user_context: Optional[str] = None,
-        examples: Optional[List[dict]] = None,
+        context: str | None = None,
+        user_context: str | None = None,
+        examples: list[dict] | None = None,
     ) -> None:
+        """
+        Initialize the PydanticAIAgent.
+        
+        Args:
+            tools: List of tools available to the agent
+            system_message: Instructions for the agent
+            model_name: The LLM model to use
+            context: Additional context information 
+            user_context: Context related to the user
+            examples: Example interactions for few-shot learning
+        """
         self.tools = tools
         self.system_message = system_message
         self.model_name = model_name
@@ -28,7 +44,6 @@ class PydanticAIAgent:
         self.user_context = user_context
         self.examples = examples or []
         self.agent = self._create_agent()
-
     def _create_agent(self) -> PydanticAgent:
         pydantic_tools = [
             PydanticTool(t.function, name=t.name, description=t.description)
