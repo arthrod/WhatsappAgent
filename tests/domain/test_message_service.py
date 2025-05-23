@@ -1,9 +1,18 @@
-import pytest
-from unittest.mock import patch, MagicMock, mock_open
-import os
-import json # Added json import
-from typing import BinaryIO
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "pytest>=7.4.0",
+#     "pytest-asyncio>=0.21.1",
+#     "pytest-mock>=3.11.1",
+#     "loguru",
+# ]
+# ///
 
+import pytest
+from pytest_mock import MockerFixture
+import json
+from io import BinaryIO
 # Assuming the app structure, adjust paths if necessary
 from app.domain.message_service import (
     transcribe_audio_file,
