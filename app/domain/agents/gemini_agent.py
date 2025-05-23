@@ -1,5 +1,5 @@
-import google.generativeai as genai
-import google.generativeai.types as genai_types
+import google.genai as genai
+import google.genai.types as genai_types
 from typing import Optional, Dict, List, Any, AsyncIterator
 
 from app.domain.tools.base import Tool, ToolResult
