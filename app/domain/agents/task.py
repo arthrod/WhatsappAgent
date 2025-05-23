@@ -85,13 +85,26 @@ class TaskAgent(BaseModel):
         provider = OpenAIProvider(api_key="dummy")
         ctx = RunContext(deps=None, model=OpenAIModel("gpt-3.5-turbo", provider=provider), usage=Usage(), prompt=None)
         tool_def = asyncio.run(pa_tool.prepare_tool_def(ctx))
-        parameters = tool_def.parameters_json_schema
-        if parameters.get("required"):
-            parameters.pop("required")
-        parameters["properties"] = {
-            key: value for key, value in parameters.get("properties", {}).items()
-            if key != "arg"
-        }
+raw_func_params_schema = tool_def.parameters_json_schema
+actual_model_schema = raw_func_params_schema.get("properties", {}).get("arg")
+
+if not actual_model_schema:
+    # Handle error or return empty schema if "arg" not found as expected
+    final_parameters = {"type": "object", "properties": {}}
+else:
+    final_parameters = actual_model_schema.copy() # Use the schema of self.arg_model
+    if final_parameters.get("required"):
+        final_parameters.pop("required")
+
+# The rest of the return structure remains the same, using final_parameters
+return {
+    "type": "function",
+    "function": {
+        "name": self.name,
+        "description": self.description,
+        "parameters": final_parameters,
+    },
+}
         return {
             "type": "function",
             "function": {
