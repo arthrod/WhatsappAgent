@@ -1,6 +1,6 @@
 from typing import Type, Callable, Optional
 
-from app.domain.agents.base import OpenAIAgent
+from app.domain.agents.pydantic_ai_agent import PydanticAIAgent
 from app.domain.tools.base import Tool
 from app.domain.tools.report_tool import report_tool
 from pydantic import BaseModel, ConfigDict, Field
@@ -54,7 +54,7 @@ class TaskAgent(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def load_agent(self, **kwargs) -> OpenAIAgent:
+    def load_agent(self, **kwargs) -> PydanticAIAgent:
 
         input_kwargs = self.arg_model(**kwargs)
         kwargs = input_kwargs.dict()
@@ -68,11 +68,11 @@ class TaskAgent(BaseModel):
         if report_tool not in self.tools:
             self.tools.append(report_tool)
 
-        return OpenAIAgent(
+        return PydanticAIAgent(
             tools=self.tools,
+            system_message=self.system_message,
             context=context,
             user_context=user_context,
-            system_message=self.system_message,
             examples=self.examples,
         )
 
