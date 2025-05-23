@@ -56,10 +56,54 @@ class PydanticAIAgent:
             instructions=instructions,
         )
 
-    def run(self, user_input: str, context: Optional[str] = None) -> str:
-        if self.user_context:
-            context = context if context else self.user_context
-        if context:
-            user_input = f"{context}\n---\n\nUser Message: {user_input}"
-        result = self.agent.run_sync(user_input)
-        return result.output
+    def run(self, user_input: str, context: str | None = None) -> str:
+        """
+        Run the agent synchronously with the provided user input and optional context.
+        
+        Args:
+            user_input: The user's request or message
+            context: Optional additional context for this specific request
+            
+        Returns:
+            str: The agent's response
+            
+        Raises:
+            Exception: If agent execution fails
+        """
+        try:
+            if self.user_context:
+                context = context if context else self.user_context
+            if context:
+                user_input = f"{context}\n---\n\nUser Message: {user_input}"
+            logger.debug(f"Running agent with input: {user_input[:100]}...")
+            result = self.agent.run_sync(user_input)
+            return result.output
+        except Exception as e:
+            logger.error(f"Error running agent: {e}")
+            raise
+    
+    async def run_async(self, user_input: str, context: str | None = None) -> str:
+        """
+        Run the agent asynchronously with the provided user input and optional context.
+        
+        Args:
+            user_input: The user's request or message
+            context: Optional additional context for this specific request
+            
+        Returns:
+            str: The agent's response
+            
+        Raises:
+            Exception: If agent execution fails
+        """
+        try:
+            if self.user_context:
+                context = context if context else self.user_context
+            if context:
+                user_input = f"{context}\n---\n\nUser Message: {user_input}"
+            logger.debug(f"Running agent asynchronously with input: {user_input[:100]}...")
+            result = await self.agent.run(user_input)
+            return result.output
+        except Exception as e:
+            logger.error(f"Error running agent asynchronously: {e}")
+            raise
