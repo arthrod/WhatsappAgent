@@ -1,12 +1,19 @@
+#!/usr/bin/env -S uv run
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "loguru",
+#     "pydantic-ai",
+# ]
+# /// 
 from __future__ import annotations
 
-from typing import Optional, List
+from loguru import logger
 
 from pydantic_ai import Agent as PydanticAgent
 from pydantic_ai import Tool as PydanticTool
 
 from app.domain.tools.base import Tool
-
 
 class PydanticAIAgent:
     """
