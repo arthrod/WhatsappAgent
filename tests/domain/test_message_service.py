@@ -166,8 +166,8 @@ def test_download_file_from_facebook_get_url_fails(
     """Tests failure when retrieving download URL from Facebook."""
     mock_os_environ_get.return_value = "dummy_whatsapp_api_key"
     
-    mock_response_get_url_fail = MagicMock()
-    mock_response_get_url_fail.status_code = 400
+    with pytest.raises(ValueError, match=r"Failed to retrieve download URL. Status: 400"):
+        download_file_from_facebook("fb_id_fail_url", "audio", "audio/aac")
     mock_requests_get.return_value = mock_response_get_url_fail # Only one call will be made
     
     with pytest.raises(ValueError, match="Failed to retrieve download URL. Status: 400, Response: "):
