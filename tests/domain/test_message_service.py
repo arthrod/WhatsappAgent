@@ -195,8 +195,8 @@ def test_download_file_from_facebook_download_file_fails(
     mock_response_get_url_success.json.return_value = {'url': 'http://dummy_download_url/file.ogg'}
     
     mock_response_download_fail = MagicMock()
-    mock_response_download_fail.status_code = 403 # Forbidden, for example
-    
+    with pytest.raises(ValueError, match=r"Failed to download file. Status: 403"):
+        download_file_from_facebook("fb_id_fail_download", "audio", "audio/ogg")
     mock_requests_get.side_effect = [mock_response_get_url_success, mock_response_download_fail]
     
     with pytest.raises(ValueError, match="Failed to download file. Status: 403, Response: "):
