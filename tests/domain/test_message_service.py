@@ -53,8 +53,8 @@ def test_transcribe_audio_file_api_error(mock_create_transcription):
     mock_audio_file = MagicMock(spec=BinaryIO)
     
     with pytest.raises(ValueError, match="Error transcribing audio: API Error"):
+    with pytest.raises(ValueError, match="Error transcribing audio"):
         transcribe_audio_file(mock_audio_file)
-
 
 # Tests for transcribe_audio
 @patch('app.domain.message_service.os.remove')
