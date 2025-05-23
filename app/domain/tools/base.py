@@ -1,7 +1,11 @@
 from typing import Type, Callable, Union
 
-from app.domain.tools.utils import convert_to_openai_tool
 from pydantic import BaseModel, ConfigDict
+import asyncio
+from pydantic_ai.tools import Tool as PATool, RunContext
+from pydantic_ai.models.openai import OpenAIModel
+from pydantic_ai.providers.openai import OpenAIProvider
+from pydantic_ai.result import Usage
 from sqlmodel import SQLModel
 
 
@@ -49,15 +53,26 @@ class Tool(BaseModel):
 
     @property
     def openai_tool_schema(self):
-        schema = convert_to_openai_tool(self.model)
-        schema["function"]["name"] = self.name
-        if schema["function"]["parameters"].get("required"):
-            del schema["function"]["parameters"]["required"]
-        schema["function"]["parameters"]["properties"] = {
-            key: value for key, value in schema["function"]["parameters"]["properties"].items()
+        """Return the OpenAI compatible tool schema using pydantic-ai."""
+        pa_tool = PATool(self.function)
+        provider = OpenAIProvider(api_key="dummy")
+        ctx = RunContext(deps=None, model=OpenAIModel("gpt-3.5-turbo", provider=provider), usage=Usage(), prompt=None)
+        tool_def = asyncio.run(pa_tool.prepare_tool_def(ctx))
+        parameters = tool_def.parameters_json_schema
+        if parameters.get("required"):
+            parameters.pop("required")
+        parameters["properties"] = {
+            key: value for key, value in parameters.get("properties", {}).items()
             if key not in self.exclude_keys
         }
-        return schema
+        return {
+            "type": "function",
+            "function": {
+                "name": self.name,
+                "description": self.description,
+                "parameters": parameters,
+            },
+        }
 
 
 class ReportSchema(BaseModel):
