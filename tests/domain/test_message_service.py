@@ -29,10 +29,7 @@ from app.schema import Audio, User # Added User import
 @patch('app.domain.message_service.llm.audio.transcriptions.create')
 def test_transcribe_audio_file_success(mock_create_transcription):
     """Tests successful transcription of an audio file."""
-    mock_transcription_object = MagicMock()
-    # The real function returns the raw value, so just return the string directly
     mock_create_transcription.return_value = "This is a test transcription."
-
     mock_audio_file = MagicMock(spec=BinaryIO)
 
     result = transcribe_audio_file(mock_audio_file)
