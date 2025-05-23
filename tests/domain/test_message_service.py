@@ -311,6 +311,7 @@ def test_send_whatsapp_message_text_success(
         "messaging_product": "whatsapp",
         "recipient_type": "individual",
         "to": recipient_phone,
+        "preview_url": False,
         "type": "text",
         "text": {"body": message_body}
     }
