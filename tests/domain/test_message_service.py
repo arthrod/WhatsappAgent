@@ -69,7 +69,12 @@ def test_transcribe_audio_success(
     mock_download_file.return_value = dummy_file_path
     mock_transcribe_file.return_value = expected_transcription
     
-    audio_object = Audio(id="audio_id_123", mime_type="audio/wav")
+    audio_object = Audio(
+        id="audio_id_123",
+        mime_type="audio/wav",
+        sha256="dummy",
+        voice=False,
+    )
     
     result = transcribe_audio(audio_object)
     
