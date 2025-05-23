@@ -21,20 +21,19 @@ from app.schema import Audio, User # Added User import
 def test_transcribe_audio_file_success(mock_create_transcription):
     """Tests successful transcription of an audio file."""
     mock_transcription_object = MagicMock()
-    mock_transcription_object.text = "This is a test transcription."
-    mock_create_transcription.return_value = mock_transcription_object
-    
+    # The real function returns the raw value, so just return the string directly
+    mock_create_transcription.return_value = "This is a test transcription."
+
     mock_audio_file = MagicMock(spec=BinaryIO)
-    
+
     result = transcribe_audio_file(mock_audio_file)
-    
+
     mock_create_transcription.assert_called_once_with(
         file=mock_audio_file,
         model="whisper-1",
         response_format="text"
     )
     assert result == "This is a test transcription."
-
 def test_transcribe_audio_file_no_file_provided():
     """Tests behavior when no audio file is provided."""
     result = transcribe_audio_file(None)
