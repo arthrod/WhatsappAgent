@@ -104,7 +104,7 @@ def send_whatsapp_message(to, message, template=True):
             }
         }
 
-    response = requests.post(url, headers=headers, data=json.dumps(data))
+    response = requests.post(url, headers=headers, data=json.dumps(data), timeout=60)
     return response.json()
 
 
