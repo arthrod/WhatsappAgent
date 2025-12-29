@@ -1,0 +1,49 @@
+name: Pytest
+
+on:
+  push:
+    branches:
+      - main
+      - feat/add-unit-tests
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          pip install poetry
+          poetry install --with test
+
+      - name: Install pytest-xdist and pytest-cov
+        run: |
+          pip install pytest-xdist pytest-cov
+
+      - name: Run pytest
+        run: |
+          poetry run pytest -n auto --maxfail=1 --disable-warnings --cov=app --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          fail_ci_if_error: true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results
+          path: pytest-results.xml
+          if-no-files-found: ignore
