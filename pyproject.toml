@@ -3,12 +3,12 @@ name = "whatsapp-legal-agent"
 version = "0.1.0"
 description = "WhatsApp Legal Agent with LLM Integration"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<4.0"
 dependencies = [
     "langfuse>=2.33.1",
     "openai>=1.30.5",
     "langchain>=0.2.1",
-    "llama-index>=0.10.42",
+    "llama-index==0.10.42",
     "anthropic>=0.28.0",
     "colorama>=0.4.6",
     "fastapi>=0.111.0",
@@ -18,7 +18,7 @@ dependencies = [
     "python-jose>=3.3.0",
     "python-dotenv>=1.0.1",
     "openpyxl>=3.1.3",
-    "psycopg2>=2.9.9",
+    "psycopg2-binary>=2.9.9",
     "pydub>=0.25.1",
     "firebase-admin>=6.5.0",
     "gcloud>=0.18.3",
@@ -30,27 +30,31 @@ dependencies = [
     "google-genai"
 ]
 
-[project.scripts]
-start = "uvicorn main:app --reload"
-test = "pytest"
-lint = "ruff check ."
-format = "black ."
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.uv]
-dev-dependencies = [
-    "pytest>=7.4.0",
-    "pytest-cov>=4.1.0",
-    "pytest-asyncio>=0.21.1",
-    "pytest-mock>=3.11.1",
-    "black>=23.7.0",
-    "ruff>=0.0.285",
-    "mypy>=1.5.0",
-    "pre-commit>=3.3.3",
-]
+[tool.poetry]
+packages = [{include = "app"}]
+
+[tool.poetry.scripts]
+start = "uvicorn.run:main"
+test = "pytest:main"
+lint = "ruff:main"
+format = "black:main"
+
+[tool.poetry.group.dev.dependencies]
+black = ">=23.7.0"
+ruff = ">=0.0.285"
+mypy = ">=1.5.0"
+pre-commit = ">=3.3.3"
+
+[tool.poetry.group.test.dependencies]
+pytest = ">=7.4.0"
+pytest-cov = ">=4.1.0"
+pytest-asyncio = ">=0.21.1"
+pytest-mock = ">=3.11.1"
+pytest-xdist = ">=3.5.0"
 
 [tool.ruff]
 line-length = 88
@@ -81,13 +85,15 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=domain",
-    "--cov=infrastructure",
+    "--cov=app",
     "--cov-branch",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
+    "-n",
+    "auto",
 ]
+addenv = ["PYTHONHASHSEED=0"]
 
 [tool.mypy]
 python_version = "3.12"
